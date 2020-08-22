@@ -8,7 +8,7 @@ class TestNFSP(unittest.TestCase):
 
     def test_init(self):
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         tf.Variable(0, name='global_step', trainable=False)
 
         agent = NFSPAgent(sess=sess,
@@ -21,14 +21,14 @@ class TestNFSP(unittest.TestCase):
         self.assertEqual(agent._action_num, 10)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
     def test_train(self):
 
         memory_init_size = 20
         step_num = 1000
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         tf.Variable(0, name='global_step', trainable=False)
         agent = NFSPAgent(sess=sess,
                          scope='nfsp',
@@ -42,7 +42,7 @@ class TestNFSP(unittest.TestCase):
                          q_replay_memory_init_size=memory_init_size,
                          q_batch_size=4,
                          q_mlp_layers=[10,10])
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
 
         predicted_action, _ = agent.eval_step({'obs': np.random.random_sample((2,)), 'legal_actions': [0, 1]})
         self.assertGreaterEqual(predicted_action, 0)
@@ -58,7 +58,7 @@ class TestNFSP(unittest.TestCase):
             agent.feed(ts)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
     def test_reservoir_buffer(self):
         buff = ReservoirBuffer(10)
@@ -81,7 +81,7 @@ class TestNFSP(unittest.TestCase):
 
     def test_evaluate_with(self):
         # Test average policy and value error here
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         tf.Variable(0, name='global_step', trainable=False)
 
         agent = NFSPAgent(sess=sess,
@@ -91,15 +91,15 @@ class TestNFSP(unittest.TestCase):
                          hidden_layers_sizes=[10,10],
                          q_mlp_layers=[10,10],
                          evaluate_with='average_policy')
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         predicted_action, _ = agent.eval_step({'obs': np.random.random_sample((2,)), 'legal_actions': [0, 1]})
         self.assertGreaterEqual(predicted_action, 0)
         self.assertLessEqual(predicted_action, 1)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         tf.Variable(0, name='global_step', trainable=False)
 
         agent = NFSPAgent(sess=sess,
@@ -109,10 +109,10 @@ class TestNFSP(unittest.TestCase):
                          hidden_layers_sizes=[10,10],
                          q_mlp_layers=[10,10],
                          evaluate_with='random')
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         with self.assertRaises(ValueError):
             predicted_action = agent.eval_step({'obs': np.random.random_sample((2,)), 'legal_actions': [0, 1]})
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 

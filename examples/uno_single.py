@@ -33,7 +33,7 @@ log_dir = './experiments/uno_single_dqn_result/'
 # Set a global seed
 set_global_seed(0)
 
-with tf.Session() as sess:
+with tf.compat.v1.Session() as sess:
 
     # Initialize a global step
     global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -47,7 +47,7 @@ with tf.Session() as sess:
                      state_shape=env.state_shape,
                      mlp_layers=[128,128])
     # Initialize global variables
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.compat.v1.global_variables_initializer())
 
     # Init a Logger to plot the learning curve
     logger = Logger(log_dir)
@@ -75,11 +75,11 @@ with tf.Session() as sess:
 
     # Plot the learning curve
     logger.plot('DQN')
-    
+
     # Save model
     save_dir = 'models/uno_single_dqn'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     saver.save(sess, os.path.join(save_dir, 'model'))
-    
+

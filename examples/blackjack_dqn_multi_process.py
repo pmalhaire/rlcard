@@ -32,7 +32,7 @@ def main():
     # Set a global seed
     set_global_seed(0)
 
-    with tf.Session() as sess:
+    with tf.compat.v1.Session() as sess:
 
         # Initialize a global step
         global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -49,7 +49,7 @@ def main():
         eval_env.set_agents([agent])
 
         # Initialize global variables
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
 
         # Initialize a Logger to plot the learning curve
         logger = Logger(log_dir)
@@ -77,7 +77,7 @@ def main():
         save_dir = 'models/blackjack_dqn'
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
-        saver = tf.train.Saver()
+        saver = tf.compat.v1.train.Saver()
         saver.save(sess, os.path.join(save_dir, 'model'))
 
 if __name__ == '__main__':

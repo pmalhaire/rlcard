@@ -38,7 +38,7 @@ log_dir = './experiments/gin_rummy_dqn_result/'
 # Set a global seed
 set_global_seed(0)
 
-with tf.Session() as sess:
+with tf.compat.v1.Session() as sess:
     # Set agents
     global_step = tf.Variable(0, name='global_step', trainable=False)
     agent = DQNAgent(sess,
@@ -52,7 +52,7 @@ with tf.Session() as sess:
 
     random_agent = RandomAgent(action_num=eval_env.action_num)
 
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.compat.v1.global_variables_initializer())
 
     env.set_agents([agent, random_agent])
     eval_env.set_agents([agent, random_agent])
@@ -97,5 +97,5 @@ with tf.Session() as sess:
     save_dir = 'models/gin_rummy_dqn'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     saver.save(sess, os.path.join(save_dir, 'model'))

@@ -31,7 +31,7 @@ log_dir = './experiments/uno_nfsp_result/'
 # Set a global seed
 set_global_seed(0)
 
-with tf.Session() as sess:
+with tf.compat.v1.Session() as sess:
 
     # Initialize a global step
     global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -62,7 +62,7 @@ with tf.Session() as sess:
     eval_env.set_agents([agents[0], random_agent])
 
     # Initialize global variables
-    sess.run(tf.global_variables_initializer())
+    sess.run(tf.compat.v1.global_variables_initializer())
 
     # Init a Logger to plot the learning curvefrom rlcard.agents.random_agent import RandomAgent
 
@@ -96,6 +96,6 @@ with tf.Session() as sess:
     save_dir = 'models/uno_nfsp'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     saver.save(sess, os.path.join(save_dir, 'model'))
     

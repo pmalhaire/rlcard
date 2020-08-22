@@ -9,7 +9,7 @@ class TestUtilsMethos(unittest.TestCase):
 
     def test_init(self):
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         env = rlcard.make('leduc-holdem', config={'allow_step_back':True})
         agent = DeepCFR(session=sess,
                         scope='deepcfr',
@@ -29,13 +29,13 @@ class TestUtilsMethos(unittest.TestCase):
         self.assertEqual(agent._batch_size_strategy, 10)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
     def test_train(self):
 
         num_iterations = 10
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         env = rlcard.make('leduc-holdem', {'allow_step_back':True})
         agent = DeepCFR(session=sess,
                         scope='deepcfr',
@@ -67,7 +67,7 @@ class TestUtilsMethos(unittest.TestCase):
         self.assertEqual(advantages.shape[0], env.action_num)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
     def test_fixed_size_ring_buffer(self):
         buf = FixedSizeRingBuffer(10)

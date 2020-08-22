@@ -211,7 +211,7 @@ class DQNAgent(object):
         Args:
             global_vars (list): A list of tensor
         '''
-        self_vars = tf.contrib.slim.get_variables(scope=self.scope, collection=tf.GraphKeys.TRAINABLE_VARIABLES)
+        self_vars = tf.contrib.slim.get_variables(scope=self.scope, collection=tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES)
         update_ops = []
         for v1, v2 in zip(global_vars, self_vars):
             op = v2.assign(v1)
@@ -236,12 +236,12 @@ class Estimator():
         self.state_shape = state_shape if isinstance(state_shape, list) else [state_shape]
         self.mlp_layers = map(int, mlp_layers)
 
-        with tf.variable_scope(scope):
+        with tf.compat.v1.variable_scope(scope):
             # Build the graph
             self._build_model()
-            update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope=tf.get_variable_scope().name)
+            update_ops = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS, scope=tf.compat.v1.get_variable_scope().name)
         # Optimizer Parameters from original paper
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate, name='dqn_adam')
+        self.optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=self.learning_rate, name='dqn_adam')
 
         with tf.control_dependencies(update_ops):
             self.train_op = self.optimizer.minimize(self.loss, global_step=tf.contrib.framework.get_global_step())
@@ -253,18 +253,18 @@ class Estimator():
         # Our input are 4 RGB frames of shape 160, 160 each
         input_shape = [None]
         input_shape.extend(self.state_shape)
-        self.X_pl = tf.placeholder(shape=input_shape, dtype=tf.float32, name="X")
+        self.X_pl = tf.compat.v1.placeholder(shape=input_shape, dtype=tf.float32, name="X")
         # The TD target value
-        self.y_pl = tf.placeholder(shape=[None], dtype=tf.float32, name="y")
+        self.y_pl = tf.compat.v1.placeholder(shape=[None], dtype=tf.float32, name="y")
         # Integer id of which action was selected
-        self.actions_pl = tf.placeholder(shape=[None], dtype=tf.int32, name="actions")
+        self.actions_pl = tf.compat.v1.placeholder(shape=[None], dtype=tf.int32, name="actions")
         # Boolean to indicate whether is training or not
-        self.is_train = tf.placeholder(tf.bool, name="is_train")
+        self.is_train = tf.compat.v1.placeholder(tf.bool, name="is_train")
 
-        batch_size = tf.shape(self.X_pl)[0]
+        batch_size = tf.shape(input=self.X_pl)[0]
 
         # Batch Normalization
-        X = tf.layers.batch_normalization(self.X_pl, training=self.is_train)
+        X = tf.compat.v1.layers.batch_normalization(self.X_pl, training=self.is_train)
 
         # Fully connected layers
         fc = tf.contrib.layers.flatten(X)
@@ -273,12 +273,12 @@ class Estimator():
         self.predictions = tf.contrib.layers.fully_connected(fc, self.action_num, activation_fn=None)
 
         # Get the predictions for the chosen actions only
-        gather_indices = tf.range(batch_size) * tf.shape(self.predictions)[1] + self.actions_pl
+        gather_indices = tf.range(batch_size) * tf.shape(input=self.predictions)[1] + self.actions_pl
         self.action_predictions = tf.gather(tf.reshape(self.predictions, [-1]), gather_indices)
 
         # Calculate the loss
-        self.losses = tf.squared_difference(self.y_pl, self.action_predictions)
-        self.loss = tf.reduce_mean(self.losses)
+        self.losses = tf.math.squared_difference(self.y_pl, self.action_predictions)
+        self.loss = tf.reduce_mean(input_tensor=self.losses)
 
     def predict(self, sess, s):
         ''' Predicts action values.
@@ -361,9 +361,9 @@ def copy_model_parameters(sess, estimator1, estimator2):
         estimator1 (Estimator): Estimator to copy the paramters from
         estimator2 (Estimator): Estimator to copy the parameters to
     '''
-    e1_params = [t for t in tf.trainable_variables() if t.name.startswith(estimator1.scope)]
+    e1_params = [t for t in tf.compat.v1.trainable_variables() if t.name.startswith(estimator1.scope)]
     e1_params = sorted(e1_params, key=lambda v: v.name)
-    e2_params = [t for t in tf.trainable_variables() if t.name.startswith(estimator2.scope)]
+    e2_params = [t for t in tf.compat.v1.trainable_variables() if t.name.startswith(estimator2.scope)]
     e2_params = sorted(e2_params, key=lambda v: v.name)
 
     update_ops = []

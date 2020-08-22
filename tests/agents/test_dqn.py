@@ -8,7 +8,7 @@ class TestDQN(unittest.TestCase):
 
     def test_init(self):
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         tf.Variable(0, name='global_step', trainable=False)
 
         agent = DQNAgent(sess=sess,
@@ -33,14 +33,14 @@ class TestDQN(unittest.TestCase):
         self.assertEqual(agent.action_num, 2)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()
 
     def test_train(self):
 
         memory_init_size = 100
         step_num = 500
 
-        sess = tf.InteractiveSession()
+        sess = tf.compat.v1.InteractiveSession()
         tf.Variable(0, name='global_step', trainable=False)
         agent = DQNAgent(sess=sess,
                          scope='dqn',
@@ -49,7 +49,7 @@ class TestDQN(unittest.TestCase):
                          update_target_estimator_every=100,
                          state_shape=[2],
                          mlp_layers=[10,10])
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
 
         predicted_action, _ = agent.eval_step({'obs': np.random.random_sample((2,)), 'legal_actions': [0, 1]})
         self.assertGreaterEqual(predicted_action, 0)
@@ -64,4 +64,4 @@ class TestDQN(unittest.TestCase):
         self.assertLessEqual(predicted_action, 1)
 
         sess.close()
-        tf.reset_default_graph()
+        tf.compat.v1.reset_default_graph()

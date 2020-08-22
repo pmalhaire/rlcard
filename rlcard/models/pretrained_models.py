@@ -20,7 +20,7 @@ class LeducHoldemNFSPModel(Model):
         import tensorflow as tf
         from rlcard.agents import NFSPAgent
         self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph)
+        self.sess = tf.compat.v1.Session(graph=self.graph)
 
         env = rlcard.make('leduc-holdem')
         with self.graph.as_default():
@@ -37,7 +37,7 @@ class LeducHoldemNFSPModel(Model):
         check_point_path = os.path.join(ROOT_PATH, 'leduc_holdem_nfsp')
         with self.sess.as_default():
             with self.graph.as_default():
-                saver = tf.train.Saver()
+                saver = tf.compat.v1.train.Saver()
                 saver.restore(self.sess, tf.train.latest_checkpoint(check_point_path))
     @property
     def agents(self):

@@ -111,11 +111,11 @@ class NFSPAgent(object):
         # Step counter to keep track of learning.
         self._step_counter = 0
 
-        with tf.variable_scope(scope):
+        with tf.compat.v1.variable_scope(scope):
             # Inner RL agent
             self._rl_agent = DQNAgent(sess, scope+'_dqn', q_replay_memory_size, q_replay_memory_init_size, q_update_target_estimator_every, q_discount_factor, q_epsilon_start, q_epsilon_end, q_epsilon_decay_steps, q_batch_size, action_num, state_shape, q_train_every, q_mlp_layers, rl_learning_rate)
 
-            with tf.variable_scope('sl'):
+            with tf.compat.v1.variable_scope('sl'):
                 # Build supervised model
                 self._build_model()
 
@@ -127,19 +127,19 @@ class NFSPAgent(object):
         # Placeholders.
         input_shape = [None]
         input_shape.extend(self._state_shape)
-        self._info_state_ph = tf.placeholder(
+        self._info_state_ph = tf.compat.v1.placeholder(
                 shape=input_shape,
                 dtype=tf.float32)
 
         self._X = tf.contrib.layers.flatten(self._info_state_ph)
 
         # Boolean to indicate whether is training or not
-        self.is_train = tf.placeholder(tf.bool, name="is_train");
+        self.is_train = tf.compat.v1.placeholder(tf.bool, name="is_train");
 
         # Batch Normalization
-        self._X = tf.layers.batch_normalization(self._X, training=True)
+        self._X = tf.compat.v1.layers.batch_normalization(self._X, training=True)
 
-        self._action_probs_ph = tf.placeholder(
+        self._action_probs_ph = tf.compat.v1.placeholder(
                 shape=[None, self._action_num], dtype=tf.float32)
 
         # Average policy network.
@@ -151,13 +151,13 @@ class NFSPAgent(object):
 
         # Loss
         self._loss = tf.reduce_mean(
-                tf.nn.softmax_cross_entropy_with_logits_v2(
+                input_tensor=tf.nn.softmax_cross_entropy_with_logits(
                         labels=tf.stop_gradient(self._action_probs_ph),
                         logits=self._avg_policy))
 
-        optimizer = tf.train.AdamOptimizer(learning_rate=self._sl_learning_rate, name='nfsp_adam')
+        optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=self._sl_learning_rate, name='nfsp_adam')
 
-        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS, scope=tf.get_variable_scope().name)
+        update_ops = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS, scope=tf.compat.v1.get_variable_scope().name)
         with tf.control_dependencies(update_ops):
             self._learn_step = optimizer.minimize(self._loss)
 

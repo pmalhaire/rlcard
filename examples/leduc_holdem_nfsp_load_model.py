@@ -16,7 +16,7 @@ set_global_seed(0)
 
 # Load pretrained model
 graph = tf.Graph()
-sess = tf.Session(graph=graph)
+sess = tf.compat.v1.Session(graph=graph)
 
 with graph.as_default():
     nfsp_agents = []
@@ -34,7 +34,7 @@ check_point_path = os.path.join(rlcard.__path__[0], 'models/pretrained/leduc_hol
 
 with sess.as_default():
     with graph.as_default():
-        saver = tf.train.Saver()
+        saver = tf.compat.v1.train.Saver()
         saver.restore(sess, tf.train.latest_checkpoint(check_point_path))
 
 # Evaluate the performance. Play with random agents.

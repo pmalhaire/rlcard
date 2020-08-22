@@ -113,21 +113,21 @@ class DeepCFR():
         info_state_shape = [None]
         info_state_shape.extend(self._embedding_size)
         # Create required TensorFlow placeholders to perform the Q-network updates.
-        self._info_state_ph = tf.placeholder(
+        self._info_state_ph = tf.compat.v1.placeholder(
             shape=info_state_shape,
             dtype=tf.float32,
             name="info_state_ph")
         self._info_state_ph = self._flatten_state(self._info_state_ph)
-        self._action_probs_ph = tf.placeholder(
+        self._action_probs_ph = tf.compat.v1.placeholder(
             shape=[None, self._num_actions],
             dtype=tf.float32,
             name="action_probs_ph")
-        self._iter_ph = tf.placeholder(
+        self._iter_ph = tf.compat.v1.placeholder(
             shape=[None], dtype=tf.float32, name="iter_ph")
         self._advantage_ph = []
         for p in range(self._num_players):
             self._advantage_ph.append(
-                tf.placeholder(
+                tf.compat.v1.placeholder(
                     shape=[None],
                     dtype=tf.float32,
                     name="advantage_ph_" + str(p)))
@@ -135,7 +135,7 @@ class DeepCFR():
         self._action_ph = []
         for p in range(self._num_players):
             self._action_ph.append(
-                tf.placeholder(
+                tf.compat.v1.placeholder(
                     shape=[None],
                     dtype=tf.int32,
                     name="action_ph_" + str(p)))
@@ -152,10 +152,10 @@ class DeepCFR():
         # and sampled regret is computed from the advantage networks.
         self._action_probs = tf.nn.softmax(action_logits)
         self._loss_policy = tf.reduce_mean(
-                tf.losses.mean_squared_error(
+                input_tensor=tf.compat.v1.losses.mean_squared_error(
                 labels=self._action_probs_ph * tf.math.sqrt(self._iter_ph)[:,tf.newaxis],
                 predictions=self._action_probs * tf.math.sqrt(self._iter_ph)[:, tf.newaxis]))
-        self._optimizer_policy = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        self._optimizer_policy = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
         self._learn_step_policy = self._optimizer_policy.minimize(self._loss_policy)
 
         # Define advantage network, loss & memory. (One per player)
@@ -163,7 +163,7 @@ class DeepCFR():
             FixedSizeRingBuffer(memory_capacity) for _ in range(self._num_players)
         ]
         self._advantage_outputs = []
-        with tf.variable_scope(scope+'_advantage'):
+        with tf.compat.v1.variable_scope(scope+'_advantage'):
             for _ in range(self._num_players):
                 fc = self._info_state_ph
                 i = 0
@@ -179,18 +179,18 @@ class DeepCFR():
             lbl = tf.math.sqrt(self._iter_ph) * self._advantage_ph[p]
             pred = self._advantage_outputs[p] * tf.math.sqrt(self._iter_ph)[:, tf.newaxis]
 
-            batch_size = tf.shape(self._info_state_ph)[0]
-            gather_indices = tf.range(batch_size) * tf.shape(pred)[1]+self._action_ph[p]
+            batch_size = tf.shape(input=self._info_state_ph)[0]
+            gather_indices = tf.range(batch_size) * tf.shape(input=pred)[1]+self._action_ph[p]
             action_predictions = tf.gather(tf.reshape(pred, [-1]), gather_indices)
 
-            loss = tf.reduce_mean(tf.losses.mean_squared_error(labels=lbl, predictions=action_predictions))
+            loss = tf.reduce_mean(input_tensor=tf.compat.v1.losses.mean_squared_error(labels=lbl, predictions=action_predictions))
             self._loss_advantages.append(loss)
 
-            self._optimizer_advantages.append(tf.train.AdamOptimizer(learning_rate=learning_rate))
+            self._optimizer_advantages.append(tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate))
             self._learn_step_advantages.append(self._optimizer_advantages[p].minimize(self._loss_advantages[p]))
 
         # Initialize all parameters in tensorflow
-        self._session.run(tf.global_variables_initializer())
+        self._session.run(tf.compat.v1.global_variables_initializer())
 
     def train(self):
         ''' Perform tree traversal and train the network
@@ -247,8 +247,8 @@ class DeepCFR():
     def reinitialize_advantage_networks():
         ''' Reinitialize the advantage networks
         '''
-        advantage_vars = [v for v in tf.global_variables() if 'advantage' in v.name]
-        tf.variables_initializer(var_list=advantage_vars)
+        advantage_vars = [v for v in tf.compat.v1.global_variables() if 'advantage' in v.name]
+        tf.compat.v1.variables_initializer(var_list=advantage_vars)
 
     def action_advantage(self, state, player):
         ''' Returns action advantages for a single batch.
