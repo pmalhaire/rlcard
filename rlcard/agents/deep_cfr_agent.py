@@ -144,9 +144,9 @@ class DeepCFR():
         self._strategy_memories = FixedSizeRingBuffer(memory_capacity)
 
         fc = self._info_state_ph
-        for dim in list(policy_network_layers):
-            fc = tf.contrib.layers.fully_connected(fc, dim, activation_fn=tf.tanh)
-        action_logits = tf.contrib.layers.fully_connected(fc, self._num_actions, activation_fn=None)
+        # for dim in list(policy_network_layers):
+        #     fc = tsf.layers.fully_conntected(fc, dim, activation_fn=tf.tanh)
+        # action_logits = tsf.layers.fully_conntected(fc, self._num_actions, activation_fn=None)
 
         # Illegal actions are handled in the traversal code where expected payoff
         # and sampled regret is computed from the advantage networks.
@@ -168,9 +168,9 @@ class DeepCFR():
                 fc = self._info_state_ph
                 i = 0
                 for dim in list(advantage_network_layers):
-                    fc = tf.contrib.layers.fully_connected(fc, dim, activation_fn=tf.tanh, reuse=False)
+                    fc = tsf.layers.fully_conntected(fc, dim, activation_fn=tf.tanh, reuse=False)
                     i += 1
-                self._advantage_outputs.append(tf.contrib.layers.fully_connected(fc, self._num_actions, activation_fn=None))
+                self._advantage_outputs.append(tsf.layers.fully_conntected(fc, self._num_actions, activation_fn=None))
 
         self._loss_advantages = []
         self._optimizer_advantages = []
@@ -515,4 +515,3 @@ class FixedSizeRingBuffer(object):
 
     def __iter__(self):
         return iter(self._data)
-

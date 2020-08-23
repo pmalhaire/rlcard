@@ -253,9 +253,12 @@ class Estimator():
         # Our input are 4 RGB frames of shape 160, 160 each
         input_shape = [None]
         input_shape.extend(self.state_shape)
+        print(f"shape{self.state_shape}")
         self.X_pl = tf.compat.v1.placeholder(shape=input_shape, dtype=tf.float32, name="X")
+        print(f"X_pl{self.X_pl}")
         # The TD target value
         self.y_pl = tf.compat.v1.placeholder(shape=[None], dtype=tf.float32, name="y")
+        print(f"y_pl{self.y_pl}")
         # Integer id of which action was selected
         self.actions_pl = tf.compat.v1.placeholder(shape=[None], dtype=tf.int32, name="actions")
         # Boolean to indicate whether is training or not
@@ -264,15 +267,15 @@ class Estimator():
         batch_size = tf.shape(input=self.X_pl)[0]
 
         model = tf.keras.models.Sequential()
-        model.add(tf.keras.Input(shape=input_shape))
-        model.add(tf.keras.layers.BatchNormalization())
+        # model.add(tf.keras.Input(shape=self.X_pl))
+        model.add(tf.keras.layers.BatchNormalization(trainable=self.is_train))
 
         # Fully connected layers
         model.add(tf.keras.layers.Flatten())
         for dim in self.mlp_layers:
             model.add(tf.keras.layers.Dense(dim, activation=tf.tanh))
         model.add(tf.keras.layers.Dense(self.action_num, activation=None))
-        self.predictions = model.output_shape
+        self.predictions = model.predict(self.X_pl,steps=batch_size)
 
         # Get the predictions for the chosen actions only
         gather_indices = tf.range(batch_size) * tf.shape(input=self.predictions)[1] + self.actions_pl
