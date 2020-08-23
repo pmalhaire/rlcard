@@ -131,7 +131,7 @@ class NFSPAgent(object):
                 shape=input_shape,
                 dtype=tf.float32)
 
-        self._X = tf.contrib.layers.flatten(self._info_state_ph)
+        self._X = tf.keras.layers.Flatten(self._info_state_ph)
 
         # Boolean to indicate whether is training or not
         self.is_train = tf.compat.v1.placeholder(tf.bool, name="is_train");
@@ -144,9 +144,10 @@ class NFSPAgent(object):
 
         # Average policy network.
         fc = self._X
+        # to be fixed
         for dim in self._layer_sizes:
-            fc = tf.contrib.layers.fully_connected(fc, dim, activation_fn=tf.tanh)
-        self._avg_policy = tf.contrib.layers.fully_connected(fc, self._action_num, activation_fn=None)
+            fc.add(tf.keras.layers.Dense(dim, activation=tf.tanh))
+        self._avg_policy = tf.keras.layers.Dense(self._action_num, activation=None)
         self._avg_policy_probs = tf.nn.softmax(self._avg_policy)
 
         # Loss

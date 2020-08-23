@@ -263,14 +263,16 @@ class Estimator():
 
         batch_size = tf.shape(input=self.X_pl)[0]
 
-        # Batch Normalization
-        X = tf.compat.v1.layers.batch_normalization(self.X_pl, training=self.is_train)
+        model = tf.keras.models.Sequential()
+        model.add(tf.keras.Input(shape=input_shape))
+        model.add(tf.keras.layers.BatchNormalization())
 
         # Fully connected layers
-        fc = tf.contrib.layers.flatten(X)
+        model.add(tf.keras.layers.Flatten())
         for dim in self.mlp_layers:
-            fc = tf.contrib.layers.fully_connected(fc, dim, activation_fn=tf.tanh)
-        self.predictions = tf.contrib.layers.fully_connected(fc, self.action_num, activation_fn=None)
+            model.add(tf.keras.layers.Dense(dim, activation=tf.tanh))
+        model.add(tf.keras.layers.Dense(self.action_num, activation=None))
+        self.predictions = model.output_shape
 
         # Get the predictions for the chosen actions only
         gather_indices = tf.range(batch_size) * tf.shape(input=self.predictions)[1] + self.actions_pl
