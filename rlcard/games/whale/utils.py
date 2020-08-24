@@ -25,15 +25,15 @@ def init_deck():
     deck = []
 
     # init wave cards
-    for num in range(1, 32):
+    for _ in range(1, 32):
         deck.append(Card('wave'))
 
     # init double_wave cards
-    for num in range(1, 8):
+    for _ in range(1, 8):
         deck.append(Card('double_wave'))
 
     # init water cards
-    for num in range(1, 40):
+    for _ in range(1, 40):
         deck.append(Card('water'))
 
     return deck
@@ -90,18 +90,3 @@ def encode_hand(plane, hand):
         card_info = CARD_MAP[card[0]]
         plane[card_info] = 1
     return plane
-
-
-# def encode_target(plane, target):
-#     ''' Encode target and represerve it into plane
-
-#     Args:
-#         plane (array): 1*4*3 numpy array
-#         target(str): string of target card
-
-#     Returns:
-#         (array): 1*4*3 numpy array
-#     '''
-#     target_info = target.split('-')
-#     plane[target_info] = 1
-#     return plane

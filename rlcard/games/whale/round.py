@@ -65,6 +65,7 @@ class WhaleRound(object):
         else:
             self._perform_draw_action(players)
 
+        # todo: create variable for this
         if player.water == 5:
             self.is_over = True
             self.winner = [self.current_player]
