@@ -1,8 +1,6 @@
-from termcolor import colored
-
 class WhaleCard(object):
 
-    info = {'type':  ['water', 'wave',"double_wave"],
+    info = {'type':  ['water', 'wave', "double_wave"],
             }
 
     def __init__(self, card_type):
@@ -21,7 +19,6 @@ class WhaleCard(object):
             (str): The string of card's type
         '''
         return self.type
-
 
     @staticmethod
     def print_cards(cards):
