@@ -1,5 +1,6 @@
 from rlcard.utils import *
 
+
 class Env(object):
     '''
     The base Env class. For all the environments in RLCard,
@@ -76,7 +77,6 @@ class Env(object):
         # Set random seed, default is None
         self._seed(config['seed'])
 
-
     def reset(self):
         '''
         Reset environment in single-agent mode
@@ -89,7 +89,8 @@ class Env(object):
             state, player_id = self.game.init_game()
             while not player_id == self.active_player:
                 self.timestep += 1
-                action, _ = self.model.agents[player_id].eval_step(self._extract_state(state))
+                action, _ = self.model.agents[player_id].eval_step(
+                    self._extract_state(state))
                 if not self.model.agents[player_id].use_raw:
                     action = self._decode_action(action)
                 state, player_id = self.game.step(action)
@@ -137,7 +138,8 @@ class Env(object):
         Note: Error will be raised if step back from the root node.
         '''
         if not self.allow_step_back:
-            raise Exception('Step back is off. To use step_back, please set allow_step_back=True in rlcard.make')
+            raise Exception(
+                'Step back is off. To use step_back, please set allow_step_back=True in rlcard.make')
 
         if not self.game.step_back():
             return False
@@ -156,7 +158,8 @@ class Env(object):
             agents (list): List of Agent classes
         '''
         if self.single_agent_mode:
-            raise ValueError('Setting agent in single agent mode or human mode is not allowed.')
+            raise ValueError(
+                'Setting agent in single agent mode or human mode is not allowed.')
 
         self.agents = agents
         # If at least one agent needs raw data, we set self.allow_raw_data = True
@@ -197,7 +200,8 @@ class Env(object):
                 action = self.agents[player_id].step(state)
 
             # Environment steps
-            next_state, next_player_id = self.step(action, self.agents[player_id].use_raw)
+            next_state, next_player_id = self.step(
+                action, self.agents[player_id].use_raw)
             # Save action
             trajectories[player_id].append(action)
 
@@ -237,7 +241,6 @@ class Env(object):
             (int): The id of the current player
         '''
         return self.game.get_player_id()
-
 
     def get_state(self, player_id):
         ''' Get the state given player id
@@ -308,7 +311,6 @@ class Env(object):
         '''
         raise NotImplementedError
 
-
     def _decode_action(self, action_id):
         ''' Decode Action id to the action in the game.
 
@@ -347,7 +349,8 @@ class Env(object):
         state, player_id = self.game.step(action)
         while not self.game.is_over() and not player_id == self.active_player:
             self.timestep += 1
-            action, _ = self.model.agents[player_id].eval_step(self._extract_state(state))
+            action, _ = self.model.agents[player_id].eval_step(
+                self._extract_state(state))
             if not self.model.agents[player_id].use_raw:
                 action = self._decode_action(action)
             state, player_id = self.game.step(action)

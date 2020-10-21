@@ -25,9 +25,8 @@ class WhaleEnv(Env):
         return models.load('whale-rule-v1')
 
     def _extract_state(self, state):
-        obs = np.zeros((3), dtype=int)
-        encode_hand(obs[:3], state['hand'])
-        encode_hand(obs[4:], state['others_hand'])
+        obs = encode_hand(state['hand'])
+        # obs.append(encode_hand(state['others_hand']))
         legal_action_id = self._get_legal_actions()
         extracted_state = {'obs': obs, 'legal_actions': legal_action_id}
         if self.allow_raw_data:

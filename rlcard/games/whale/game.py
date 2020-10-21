@@ -120,7 +120,8 @@ class WhaleGame(object):
             (list): A list of legal actions
         '''
 
-        return self.round.get_legal_actions(self.players, self.round.current_player)
+        return self.round.get_legal_actions(self.players,
+                                            self.round.current_player)
 
     def get_player_num(self):
         ''' Return the number of players in Limit Texas Hold'em

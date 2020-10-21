@@ -72,11 +72,10 @@ def hand2dict(hand):
     return hand_dict
 
 
-def encode_hand(plane, hand):
+def encode_hand(hand):
     ''' Encode hand and represerve it into plane
 
     Args:
-        plane (array): 3 numpy array
         hand (list): list of string of hand's card
 
     Returns:
